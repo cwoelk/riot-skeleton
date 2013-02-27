@@ -7,16 +7,16 @@ import java.util.Collections;
 
 import org.riotfamily.core.dao.Hierarchy;
 import org.riotfamily.core.dao.ListParams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 
-public class FileNodeDao extends FileRootDao implements Hierarchy {
+public class FileNodeDao extends FileDao implements Hierarchy {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	//private Logger log = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public Collection<?> list(Object parent, ListParams params) throws DataAccessException {
+	public Collection<?> list(Object parent, ListParams params)
+			throws DataAccessException {
+		
 		File[] files = getFiles(parent);
 		if (files != null) {
 			return Arrays.asList(files);
@@ -27,7 +27,10 @@ public class FileNodeDao extends FileRootDao implements Hierarchy {
 	@Override
 	public Object getParent(Object entity) {
 		File file = (File) entity;
-		return file.getParent();
+		if (file != null && rootFile != null && !rootFile.equals(file)) {
+			return file.getParentFile();
+		}
+		return null;
 	}
 
 }

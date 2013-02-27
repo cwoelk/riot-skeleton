@@ -18,19 +18,25 @@
 		<bean class="org.riotfamily.core.screen.list.command.impl.AddCommand" />
 	</util:list>
 
+	<bean id="fileFileFilter" class="de.neteye.riot.dao.FileFileFilter" />
+	
+	<bean id="directoryFileFilter" class="de.neteye.riot.dao.DirectoryFileFilter" />
+
 	<override:add ref="rootScreens">
 		<ref bean="sitemaps" />
 
 		<s:list id="fileBrowser" label-property="name" icon="application_side_tree">
 			<s:dao>
-				<bean class="de.neteye.riot.dao.FileTreeDao">
+				<bean class="de.neteye.riot.dao.FileRootNodeTreeDao">
+					<property name="root" value="file://#{systemProperties['user.home']}" />
 					<property name="rootDao">
-						<bean class="de.neteye.riot.dao.FileRootDao">
-							<property name="root" value="file://#{systemProperties['user.home']}" />
+						<bean class="de.neteye.riot.dao.FileDao">
+							<property name="fileFilter" ref="directoryFileFilter" />
 						</bean>
 					</property>
 					<property name="nodeDao">
 						<bean class="de.neteye.riot.dao.FileNodeDao">
+							<property name="fileFilter" ref="directoryFileFilter" />
 						</bean>
 					</property>
 				</bean>
@@ -39,7 +45,25 @@
 				<s:column property="name" />
 			</s:columns>
 			<s:commands>
+				<bean class="org.riotfamily.core.screen.list.command.impl.GoToNestedCommand" />
 			</s:commands>
+			
+			<s:list id="fileList" label-property="name" icon="application_side_tree">
+				<s:dao>
+					<bean class="de.neteye.riot.dao.FileDao">
+						<property name="fileFilter" ref="fileFileFilter" />
+					</bean>
+				</s:dao>
+				<s:columns>
+					<s:column property="name" />
+				</s:columns>
+				<s:commands>
+				</s:commands>
+				<!--
+				<s:form id="fileForm"></s:form>
+				-->
+			</s:list>
+			
 		</s:list>
 
 	</override:add>

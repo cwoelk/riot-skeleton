@@ -2,7 +2,6 @@ package de.neteye.riot.dao;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -10,21 +9,36 @@ import java.util.Collections;
 import org.riotfamily.core.dao.ListParams;
 import org.riotfamily.core.dao.RiotDao;
 import org.riotfamily.core.dao.RiotDaoException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 
-public class FileRootDao implements RiotDao {
+public class FileDao implements RiotDao {
 
-	private Logger log = LoggerFactory.getLogger(getClass());
+	//private Logger log = LoggerFactory.getLogger(getClass());
 	
-	private Resource root;
-	
-	public void setRoot(Resource root) {
-		this.root = root;
+	private FileFilter fileFilter;
+		
+	protected File rootFile;
+
+	public void setRootFile(File rootFile) {
+		this.rootFile = rootFile;
 	}
 
+	public void setFileFilter(FileFilter fileFilter) {
+		this.fileFilter = fileFilter;
+	}
+	
+	public FileFilter getFileFilter() {
+		if (fileFilter == null) {
+			fileFilter = new FileFilter() {
+				@Override
+				public boolean accept(File pathname) {
+					return true;
+				}
+			};
+		}
+		return fileFilter;
+	}
+	
 	@Override
 	public Class<?> getEntityClass() {
 		return File.class;
@@ -33,12 +47,12 @@ public class FileRootDao implements RiotDao {
 	@Override
 	public String getObjectId(Object entity) {
 		File file = (File) entity;
-		return file.getAbsolutePath();
+		return file.getAbsolutePath().replaceAll("/", ":");
 	}
 
 	@Override
 	public Object load(String id) throws DataAccessException {
-		return new File(id);
+		return new File(id.replaceAll(":", "/"));
 	}
 
 	@Override
@@ -78,23 +92,19 @@ public class FileRootDao implements RiotDao {
 	}
 
 	protected File[] getFiles(Object parent) {
+		File[] files = new File[] {};
+
 		File file = (File) parent;
 		if (file == null) {
-			try {
-				file = root.getFile();
-			}
-			catch (IOException e) {
-				log.error("An exception occured:", e);
+			if (rootFile != null) {
+				file = rootFile;
 			}
 		}
-		
-		File[] files = file.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File file) {
-				return file.isDirectory(); // && !file.isHidden();
-			}
-		});
 
+		if (file != null) {
+			files = file.listFiles(getFileFilter());
+		}
+		
 		return files;
 	}
 	
