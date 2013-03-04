@@ -38,9 +38,6 @@ var RiotMultiList = Class.create({
 
 	handleControlSelectionChanged: function(ev) {
 		if (ev.memo.length === 1) {
-			ev.memo.each(function (item) {
-				console.log(item);
-			});
 			var mainList = this.getMainList();
 			ListService.gotoItemScreenUrl(this.controlList.key, ev.memo, true,
 				mainList.processCommandResult.bind(mainList));
