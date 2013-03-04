@@ -299,7 +299,7 @@ var RiotList = Class.create({
 			var win = eval(result.target),
 					url = result.url;
 
-			if (win === window && list.embedded) {
+			if (win == window && list.embedded) {
 				url = Util.addParameter(url, 'embedded', 'true');
 			}
 			if (result.replace) {
