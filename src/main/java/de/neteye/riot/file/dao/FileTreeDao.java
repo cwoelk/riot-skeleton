@@ -1,4 +1,4 @@
-package de.neteye.riot.dao;
+package de.neteye.riot.file.dao;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,9 +18,9 @@ public class FileTreeDao extends TreeDao
 
 	private Resource root;
 
-	private FileDao rootDao;
+	private AbstractFileDao rootDao;
 
-	private FileDao nodeDao;
+	private AbstractFileDao nodeDao;
 
 	protected File rootFile;
 	
@@ -31,13 +31,13 @@ public class FileTreeDao extends TreeDao
 	@Override
 	public void setRootDao(RiotDao rootDao) {
 		super.setRootDao(rootDao);
-		this.rootDao = (FileDao) rootDao;
+		this.rootDao = (AbstractFileDao) rootDao;
 	}
 	
 	@Override
 	public void setNodeDao(Hierarchy nodeDao) {
 		super.setNodeDao(nodeDao);
-		this.nodeDao = (FileDao) nodeDao;
+		this.nodeDao = (AbstractFileDao) nodeDao;
 	}
 
 	@Override

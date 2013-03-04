@@ -1,4 +1,4 @@
-package de.neteye.riot.dao;
+package de.neteye.riot.file.filter;
 
 import java.io.File;
 import java.io.FileFilter;
