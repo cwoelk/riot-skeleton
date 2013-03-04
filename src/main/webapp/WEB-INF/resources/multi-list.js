@@ -12,16 +12,23 @@ var RiotMultiList = Class.create({
 			this.handleControlSelectionChanged.bind(this));
 	},
 
-	getMainList: function() {
-		return this.mainListFrame.contentWindow.list;
+	getMainListWindow: function() {
+		return this.mainListFrame.contentWindow;
 	},
 
+  getMainList: function() {
+    return this.getMainListWindow().list;
+  },
+
 	resizeMainListFrame: function(dimensions) {
-		this.mainListFrame.setStyle({ height: dimensions.height + 'px' });
+    var mainListWindow = this.getMainListWindow();
+    var extraHeight = mainListWindow.$('extra').getHeight(),
+        iframeHeight = Math.max(dimensions.height, extraHeight);
+
+		this.mainListFrame.setStyle({ height: iframeHeight + 'px' });
 	},
 
 	updateControlList: function(parentId, state) {
-		console.log(parentId, state);
 		var row = ListRow.get(parentId);
 		if (row) {
 			row.expand.call(row);
@@ -30,8 +37,7 @@ var RiotMultiList = Class.create({
 	},
 
 	handleControlSelectionChanged: function(ev) {
-		console.log(ev);
-		if (ev.memo.length > 0) {
+		if (ev.memo.length === 1) {
 			ev.memo.each(function (item) {
 				console.log(item);
 			});
