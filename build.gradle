@@ -1,6 +1,5 @@
 apply plugin: 'java'
 apply plugin: 'war'
-apply plugin: 'eclipse'
 apply plugin: 'eclipse-wtp'
 apply plugin: 'maven'
 apply plugin: 'jetty'
@@ -10,15 +9,19 @@ targetCompatibility = JavaVersion.VERSION_1_6
 
 repositories {
 	mavenLocal()
-	mavenRepo urls: "file://$System.env.HOME/.m2/repository", { checkmodified = true; }
+	//mavenRepo urls: "file://$System.env.HOME/.m2/repository", { checkmodified = true; }
 	mavenRepo urls: 'http://repository.riotfamily.org/external'
 	mavenRepo urls: 'http://repository.riotfamily.org/cache'
 	mavenRepo urls: 'http://repository.riotfamily.org/snapshots', { checkmodified = true; }
 }
 
 dependencies {
+	providedRuntime 'org.mortbay.jetty:jetty-ajp:6.1.26'
+
+	providedCompile 'javax.servlet:servlet-api:2.5'
+
 	compile 'org.riotfamily:content:9.1.0-SNAPSHOT'
-	
+
 	runtime 'postgresql:postgresql:8.1-407.jdbc3',
 			'org.slf4j:jcl-over-slf4j:1.6.1',
 			'org.slf4j:slf4j-log4j12:1.6.1',
@@ -39,4 +42,10 @@ war {
 	manifest {
 		attributes 'Manifest-Version': '1.0', 'version': project.version
 	}
+}
+
+[jettyRun, jettyRunWar]*.with {
+	reload = 'automatic'
+	jettyConfig = file('jetty.xml')
+	additionalRuntimeJars = sourceSets.main.runtimeClasspath
 }
