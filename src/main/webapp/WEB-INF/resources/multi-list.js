@@ -33,7 +33,6 @@ var RiotMultiList = Class.create({
 		if (row) {
 			row.expand.call(row);
 		}
-		console.log(row);
 	},
 
 	handleControlSelectionChanged: function(ev) {
