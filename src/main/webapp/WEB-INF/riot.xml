@@ -13,29 +13,78 @@
 		http://www.riotfamily.org/schema/core/screen-9.1.xsd">
 
 	<util:list id="defaultCommands">
+		<bean class="org.riotfamily.core.screen.list.command.impl.GoToNestedCommand" />
 		<bean class="org.riotfamily.core.screen.list.command.impl.EditCommand" />
 		<bean class="org.riotfamily.core.screen.list.command.impl.DeleteCommand" />
 		<bean class="org.riotfamily.core.screen.list.command.impl.AddCommand" />
 	</util:list>
 
-	<bean id="fileFileFilter" class="de.neteye.riot.dao.FileFileFilter" />
-	
-	<bean id="directoryFileFilter" class="de.neteye.riot.dao.DirectoryFileFilter" />
+	<bean id="fileFileFilter" class="de.neteye.riot.file.filter.FileFileFilter" />
+
+	<bean id="directoryFileFilter" class="de.neteye.riot.file.filter.DirectoryFileFilter" />
 
 	<override:add ref="rootScreens">
 		<ref bean="sitemaps" />
 
-		<s:list id="fileBrowser" label-property="name" icon="application_side_tree">
+		<s:multi-list id="fileBrowser" icon="application_side_tree">
+			<s:list id="folderTree" label-property="name" icon="application_side_tree"><!-- controlList -->
+				<s:dao>
+					<bean class="de.neteye.riot.file.dao.ModelFileRootNodeTreeDao">
+						<property name="root" value="file://${fileBrowser.root=#{systemProperties['user.home']}}" />
+						<property name="rootDao">
+							<bean class="de.neteye.riot.file.dao.ModelFileDao">
+								<property name="fileFilter" ref="directoryFileFilter" />
+							</bean>
+						</property>
+						<property name="nodeDao">
+							<bean class="de.neteye.riot.file.dao.ModelFileNodeDao">
+								<property name="fileFilter" ref="directoryFileFilter" />
+							</bean>
+						</property>
+					</bean>
+				</s:dao>
+				<s:columns>
+					<s:column>
+						<bean class="de.neteye.riot.file.renderer.ModelFileTreeRenderer" />
+					</s:column>
+					<!--<s:column property="lastModified" />-->
+				</s:columns>
+				<s:commands>
+				</s:commands>
+			</s:list>
+
+			<s:list id="fileList" label-property="name" icon="application_side_tree" filter-form="fileFilter"><!-- mainList -->
+				<s:dao>
+					<bean class="de.neteye.riot.file.dao.ModelFileDao">
+						<property name="root" value="file://${fileBrowser.root=#{systemProperties['user.home']}}" />
+					</bean>
+				</s:dao>
+				<s:columns>
+					<s:column>
+						<bean class="de.neteye.riot.file.renderer.ModelFileTreeRenderer" />
+					</s:column>
+					<s:column property="lastModified" />
+				</s:columns>
+				<s:commands>
+					<bean class="de.neteye.riot.file.commands.GoIntoFolderCommand" />
+					<bean class="org.riotfamily.core.screen.list.command.impl.EditCommand" />
+				</s:commands>
+				<s:form id="modelFileForm"></s:form>
+			</s:list>
+
+		</s:multi-list>
+
+		<s:list id="nestedFolderTree" label-property="name" icon="application_side_tree"><!-- controlList -->
 			<s:dao>
-				<bean class="de.neteye.riot.dao.FileRootNodeTreeDao">
-					<property name="root" value="file://#{systemProperties['user.home']}" />
+				<bean class="de.neteye.riot.file.dao.FileRootNodeTreeDao">
+					<property name="root" value="file://${fileBrowser.root=#{systemProperties['user.home']}}" />
 					<property name="rootDao">
-						<bean class="de.neteye.riot.dao.FileDao">
+						<bean class="de.neteye.riot.file.dao.FileDao">
 							<property name="fileFilter" ref="directoryFileFilter" />
 						</bean>
 					</property>
 					<property name="nodeDao">
-						<bean class="de.neteye.riot.dao.FileNodeDao">
+						<bean class="de.neteye.riot.file.dao.FileNodeDao">
 							<property name="fileFilter" ref="directoryFileFilter" />
 						</bean>
 					</property>
@@ -47,23 +96,21 @@
 			<s:commands>
 				<bean class="org.riotfamily.core.screen.list.command.impl.GoToNestedCommand" />
 			</s:commands>
-			
-			<s:list id="fileList" label-property="name" icon="application_side_tree">
+
+			<s:list id="nestedFileList" label-property="name" icon="application_side_tree"><!-- mainList -->
 				<s:dao>
-					<bean class="de.neteye.riot.dao.FileDao">
-						<property name="fileFilter" ref="fileFileFilter" />
+					<bean class="de.neteye.riot.file.dao.FileDao">
+						<property name="root" value="file://${fileBrowser.root=#{systemProperties['user.home']}}" />
 					</bean>
 				</s:dao>
 				<s:columns>
 					<s:column property="name" />
 				</s:columns>
 				<s:commands>
+					<bean class="org.riotfamily.core.screen.list.command.impl.EditCommand" />
 				</s:commands>
-				<!--
-				<s:form id="fileForm"></s:form>
-				-->
+				<s:form id="nestedFileForm"></s:form>
 			</s:list>
-			
 		</s:list>
 
 	</override:add>
